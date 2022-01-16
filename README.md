@@ -18,3 +18,5 @@
 
 * Curl to get translated pokemon data for ditto
     - curl --request GET 'localhost:7000/pokemon/translate/ditto' -v 
+
+* Client is created with sigleton pattern. 
