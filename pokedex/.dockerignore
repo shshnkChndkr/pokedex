@@ -1,0 +1,8 @@
+.github
+environments/
+test/
+node_modules/
+.eslintrc.yml
+.gitignore
+.gitmodules
+docker-compose.yml

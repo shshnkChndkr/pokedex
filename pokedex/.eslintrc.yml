@@ -1,9 +1,11 @@
 env:
   browser: true
   es2021: true
+  mocha: true
+  node: true
 extends:
   - airbnb-base
 parserOptions:
-  ecmaVersion: 13
+  ecmaVersion: 2020
   sourceType: module
 rules: {}

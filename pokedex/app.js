@@ -1,36 +1,33 @@
-const createError = require('http-errors');
 const express = require('express');
-const path = require('path');
-const cookieParser = require('cookie-parser');
-const logger = require('morgan');
+const morgan = require('morgan');
+const rateLimit = require('express-rate-limit');
+const helmet = require('helmet');
+const Logger = require('./logger/logger');
 
-const indexRouter = require('./routes/index');
+const pokemonRouter = require('./routes/pokemonRoute');
 
+const logger = Logger.getLogger('./app.js');
+
+const {
+  RATE_LIMIT_THRESHOLD_ENTRY_ROUTE = 50, // 50 requests per minute,
+  RATE_LIMIT_PERIOD_MS_ENTRY_ROUTE = 1 * 60 * 1000, // 1 minutes
+} = process.env;
+
+const limiter = rateLimit({
+  windowMs: RATE_LIMIT_PERIOD_MS_ENTRY_ROUTE,
+  max: RATE_LIMIT_THRESHOLD_ENTRY_ROUTE,
+  message: 'Too many requests, please try again later.',
+});
+
+morgan.token('body', (req) => JSON.stringify(req.body));
 const app = express();
 
-app.use(logger('dev'));
-app.use(express.json());
-app.use(express.urlencoded({ extended: false }));
-app.use(cookieParser());
-app.use(express.static(path.join(__dirname, 'public')));
+app.use(morgan('combined', { stream: logger.stream }));
+app.use(morgan(':method :url :status :response-time ms - :res[content-length] :body - :req[content-length]'));
+app.use(helmet());
 
-app.use('/', indexRouter);
+app.use('/pokemon', limiter, pokemonRouter);
 
-// catch 404 and forward to error handler
-app.use((req, res, next) => {
-  next(createError(404));
-});
-
-// error handler
-app.use((err, req, res, next) => {
-  // set locals, only providing error in development
-  res.locals.message = err.message;
-  res.locals.error = req.app.get('env') === 'development' ? err : {};
-
-  // render the error page
-  res.status(err.status || 500);
-  res.render('error');
-  next();
-});
+logger.info('App started');
 
 module.exports = app;

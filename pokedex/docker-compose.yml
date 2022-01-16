@@ -1,14 +1,14 @@
 version: '3.8'
 services:
-  web:
+  pokedex:
     build:
-      context: ./
-      target: dev
+      context: .
+      dockerfile: Dockerfile
+    image: pokedex
     volumes:
       - .:/src
-    command: nodemon npm run start:dev
+    command: nodemon npm run start
+    restart: unless-stopped
     ports:
-      - "6000:6000"
-    environment:
-      NODE_ENV: development
-      DEBUG: nodejs-docker-express:*
+      - "7000:7000"
+    env_file: environments/.env-sample
